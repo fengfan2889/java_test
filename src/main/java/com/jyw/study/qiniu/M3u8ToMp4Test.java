@@ -14,6 +14,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * m3u8文件转MP4
+ *
+ * @author jyw
+ */
 public class M3u8ToMp4Test {
 
     public static void main(String[] args) throws IOException {
@@ -28,8 +33,8 @@ public class M3u8ToMp4Test {
             if (entity != null) {
                 String result = EntityUtils.toString(entity, "UTF-8");
 
-                String[] strs = result.split("\n");
-                List<String> list = Stream.of(strs).filter(line -> !line.startsWith("#") && line.endsWith(".ts")).collect(Collectors.toList());
+                String[] tsUrls = result.split("\n");
+                List<String> list = Stream.of(tsUrls).filter(line -> !line.startsWith("#") && line.endsWith(".ts")).collect(Collectors.toList());
                 System.out.println(JSONObject.toJSONString(list));
                 int i = 0;
                 for (String tsFilename : list) {
@@ -42,10 +47,11 @@ public class M3u8ToMp4Test {
                     System.out.println(url + "     begin-------------" + i + "/" + list.size());
                     int byteCount = 0;
                     int bytesRead;
-                    for(byte[] buffer = new byte[4096]; (bytesRead = inputStream.read(buffer)) != -1; byteCount += bytesRead) {
+                    int maxOneReadByte = 4096 ;
+                    for(byte[] buffer = new byte[maxOneReadByte]; (bytesRead = inputStream.read(buffer)) != -1; byteCount += bytesRead) {
                         outputStream.write(buffer, 0, bytesRead);
                     }
-                    System.out.println(url + "     end--------------------------");
+                    System.out.println(url + "     end--------------------------" + byteCount );
 
                     outputStream.flush();
                     outputStream.close();
